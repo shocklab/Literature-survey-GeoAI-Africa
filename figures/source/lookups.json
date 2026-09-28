@@ -1,0 +1,481 @@
+{
+ "_comment": "Derived from old_Reviewed_articles_only.xlsx long sheets by build_lookups; the two Aerial sensors and the platform map are hand-added. build_figures.py exits if a raw token is missing here.",
+ "_methods": "[Family, Category]",
+ "_sensors": "[Category, Platform, Resolution]",
+ "_weather": "key = token lowercased with non-alphanumerics removed; value = canonical source, or \"\" to drop",
+ "methods": {
+  "2D-CNN": [
+   "CNN - classification",
+   "Deep Learning"
+  ],
+  "3D-CNN": [
+   "Spatio-temporal",
+   "Deep Learning"
+  ],
+  "ANN": [
+   "Neural network",
+   "Classical ML"
+  ],
+  "AdaBoost": [
+   "Gradient boosting",
+   "Classical ML"
+  ],
+  "Autoencoder": [
+   "Self-supervised and representation learning",
+   "Deep Learning"
+  ],
+  "Barlow Twins": [
+   "Self-supervised and representation learning",
+   "Deep Learning"
+  ],
+  "CNN": [
+   "CNN - classification",
+   "Deep Learning"
+  ],
+  "CNN-LSTM (hybrid)": [
+   "Spatio-temporal",
+   "Deep Learning"
+  ],
+  "Canonical Correlation Forest": [
+   "Random forest",
+   "Classical ML"
+  ],
+  "ConvLSTM": [
+   "Spatio-temporal",
+   "Deep Learning"
+  ],
+  "DNN": [
+   "Deep neural network",
+   "Deep Learning"
+  ],
+  "Decision Tree": [
+   "Decision tree",
+   "Classical ML"
+  ],
+  "DeepLab": [
+   "CNN - segmentation",
+   "Deep Learning"
+  ],
+  "Extra Trees": [
+   "Random forest",
+   "Classical ML"
+  ],
+  "FCN": [
+   "CNN - segmentation",
+   "Deep Learning"
+  ],
+  "GLM": [
+   "Linear & probabilistic",
+   "Classical ML"
+  ],
+  "GPR": [
+   "Linear & probabilistic",
+   "Classical ML"
+  ],
+  "Gradient Boosting": [
+   "Gradient boosting",
+   "Classical ML"
+  ],
+  "K-means": [
+   "Clustering",
+   "Classical ML"
+  ],
+  "KNN": [
+   "k-NN",
+   "Classical ML"
+  ],
+  "LDA": [
+   "Linear & probabilistic",
+   "Classical ML"
+  ],
+  "LSTM/RNN": [
+   "Recurrent",
+   "Deep Learning"
+  ],
+  "LightGBM": [
+   "Gradient boosting",
+   "Classical ML"
+  ],
+  "Linear Regression": [
+   "Linear & probabilistic",
+   "Classical ML"
+  ],
+  "Logistic Regression": [
+   "Linear & probabilistic",
+   "Classical ML"
+  ],
+  "MLP": [
+   "Neural network",
+   "Classical ML"
+  ],
+  "MaxEnt": [
+   "Linear & probabilistic",
+   "Classical ML"
+  ],
+  "Minimum Distance": [
+   "Linear & probabilistic",
+   "Classical ML"
+  ],
+  "Naive Bayes": [
+   "Linear & probabilistic",
+   "Classical ML"
+  ],
+  "Neural Network": [
+   "Neural network",
+   "Classical ML"
+  ],
+  "Prithvi": [
+   "Foundation model",
+   "Foundation model"
+  ],
+  "Random Forest": [
+   "Random forest",
+   "Classical ML"
+  ],
+  "RetinaNet": [
+   "CNN - detection",
+   "Deep Learning"
+  ],
+  "ST++": [
+   "Semi-supervised segmentation",
+   "Deep Learning"
+  ],
+  "SVM": [
+   "SVM",
+   "Classical ML"
+  ],
+  "TabPFN": [
+   "Foundation model",
+   "Foundation model"
+  ],
+  "U-Net": [
+   "CNN - segmentation",
+   "Deep Learning"
+  ],
+  "Vision Transformer": [
+   "Transformer",
+   "Deep Learning"
+  ],
+  "XGBoost": [
+   "Gradient boosting",
+   "Classical ML"
+  ],
+  "YOLO": [
+   "CNN - detection",
+   "Deep Learning"
+  ]
+ },
+ "platforms": {
+  "AWS": "AWS",
+  "Azure": "Microsoft Azure",
+  "CECI": "Local / national HPC",
+  "Digital Earth Africa (DEA)": "Digital Earth Africa",
+  "ESA CloudToolbox": "ESA CloudToolbox",
+  "GEE": "Google Earth Engine",
+  "Google Cloud Platform": "Google Cloud Platform",
+  "Google Cloud Platform (GCP)": "Google Cloud Platform",
+  "Google Colab": "Google Colab",
+  "Hugging Face": "Hugging Face",
+  "Local HPC": "Local / national HPC",
+  "Microsoft Planetary Computer": "Microsoft Planetary Computer",
+  "NAISS": "Local / national HPC",
+  "NASA AMES Supercomputer": "Local / national HPC",
+  "NASA Earth Exchange (NEX)": "NASA Earth Exchange",
+  "Planet Explorer Portal": "Planet Explorer Portal",
+  "SEPAL (FAO)": "SEPAL (FAO)",
+  "SURFSARA": "Local / national HPC",
+  "Sentinel Hub": "Sentinel Hub",
+  "local HPC": "Local / national HPC"
+ },
+ "repository_type": {
+  "Dataverse": "archival",
+  "Figshare": "archival",
+  "Fordatis record": "archival",
+  "GEE": "mutable",
+  "Github": "mutable",
+  "Kaggle": "mutable",
+  "Mendeley": "archival",
+  "Nakala": "archival",
+  "Source Cooperative": "archival",
+  "Zenodo": "archival"
+ },
+ "sensors": {
+  "ALOS": [
+   "SAR",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "AVHRR": [
+   "Optical",
+   "Satellite",
+   "Coarse (>100 m)"
+  ],
+  "Aerial (Manned aircraft)": [
+   "Optical",
+   "Manned aircraft",
+   "Very high (<1 m)"
+  ],
+  "Aerial (UAV)": [
+   "Optical",
+   "UAV",
+   "Very high (<1 m)"
+  ],
+  "DESIS": [
+   "Optical",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "DMSP/OLS": [
+   "Optical",
+   "Satellite",
+   "Coarse (>100 m)"
+  ],
+  "ERS-1/2": [
+   "SAR",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "Envisat ASAR": [
+   "SAR",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "Envisat MERIS": [
+   "Optical",
+   "Satellite",
+   "Coarse (>100 m)"
+  ],
+  "Gaofen": [
+   "Optical",
+   "Satellite",
+   "High (1-10 m)"
+  ],
+  "GeoEye-1": [
+   "Optical",
+   "Satellite",
+   "Very high (<1 m)"
+  ],
+  "HJ (Huan Jing)": [
+   "Optical",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "HLS": [
+   "Optical",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "Landsat-4": [
+   "Optical",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "Landsat-5": [
+   "Optical",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "Landsat-7": [
+   "Optical",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "Landsat-8": [
+   "Optical",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "Landsat-9": [
+   "Optical",
+   "Satellite",
+   "Moderate (10-100 m)"
+  ],
+  "MODIS": [
+   "Optical",
+   "Satellite",
+   "Coarse (>100 m)"
+  ],
+  "PlanetScope": [
+   "Optical",
+   "Satellite",
+   "High (1-10 m)"
+  ],
+  "Pleiades": [
+   "Optical",
+   "Satellite",
+   "Very high (<1 m)"
+  ],
+  "QuickBird-2": [
+   "Optical",
+   "Satellite",
+   "Very high (<1 m)"
+  ],
+  "RapidEye": [
+   "Optical",
+   "Satellite",
+   "High (1-10 m)"
+  ],
+  "SMAP": [
+   "Passive microwave",
+   "Satellite",
+   "Coarse (>100 m)"
+  ],
+  "SMOS": [
+   "Passive microwave",
+   "Satellite",
+   "Coarse (>100 m)"
+  ],
+  "SPOT-6": [
+   "Optical",
+   "Satellite",
+   "High (1-10 m)"
+  ],
+  "Sentinel-1": [
+   "SAR",
+   "Satellite",
+   "High (1-10 m)"
+  ],
+  "Sentinel-2": [
+   "Optical",
+   "Satellite",
+   "High (1-10 m)"
+  ],
+  "SkySat": [
+   "Optical",
+   "Satellite",
+   "Very high (<1 m)"
+  ],
+  "VIIRS": [
+   "Optical",
+   "Satellite",
+   "Coarse (>100 m)"
+  ],
+  "WorldView-2": [
+   "Optical",
+   "Satellite",
+   "Very high (<1 m)"
+  ],
+  "WorldView-3": [
+   "Optical",
+   "Satellite",
+   "Very high (<1 m)"
+  ]
+ },
+ "skip_models": {
+  "OBIA": "object-based image analysis is an approach, not a model; the old file recorded no model for this study"
+ },
+ "weather": {
+  "africanrainfallestimat": "RFE 2.0",
+  "agencenationaledelameteorologiedub": "Weather station",
+  "algiersmeteorologicaldatalocalstation": "Weather station",
+  "awhere": "aWhere",
+  "chelsabioclimatic": "CHELSA",
+  "chirps": "CHIRPS",
+  "climatedatastorecds": "Climate Data Store",
+  "climaticresearchunitcrutimeseries": "CRU TS",
+  "cruts": "CRU TS",
+  "era5land": "ERA5 / ERA5-Land",
+  "era5reanalysis": "ERA5 / ERA5-Land",
+  "eros": "",
+  "fewsnetfldas": "FEWS NET / FLDAS",
+  "gfs": "GFS",
+  "gldas": "GLDAS",
+  "globallandsurfacetemperature": "",
+  "gpmimerg": "GPM IMERG",
+  "meteorologicalstationsouthafricanweat": "Weather station",
+  "modislst": "",
+  "nasaclimate": "NASA climate",
+  "nasasgiovannirasters": "NASA Giovanni",
+  "ncep": "NCEP",
+  "nigerianmeteorologicalagencystationnet": "Weather station",
+  "noaaeto": "NOAA ETo",
+  "sm2rain": "SM2RAIN",
+  "southafricaweatherservicessaws": "Weather station",
+  "tamsat": "TAMSAT",
+  "terraclimate": "TerraClimate",
+  "wapordailyreference": "WaPOR",
+  "worldclim": "WorldClim",
+  "worldclim2": "WorldClim"
+ },
+ "_st": "Spatio-temporal Sankey (fig-spatiotemporal): st_applications groups Sub-domain into Ian's seven application rows; st_families maps each sensor to a data-source node, \"\" = excluded (very-high-resolution and aerial imagery, and HJ-1); st_properties is the interpretive sensor-to-role mapping in the third column. A span-reporting study whose sub-domain or sensor is missing here stops the script.",
+ "st_applications": {
+  "Urban expansion": "Urban & settlement",
+  "Informal settlement": "Urban & settlement",
+  "Settlement": "Urban & settlement",
+  "Urban heat island": "Urban & settlement",
+  "Electrification": "Urban & settlement",
+  "Population": "Urban & settlement",
+  "Road": "Urban & settlement",
+  "Land use planning": "Urban & settlement",
+  "Crop mapping": "Crop & yield",
+  "Yield estimation": "Crop & yield",
+  "Pest & disease": "Crop & yield",
+  "LULC": "LULC & deforestation",
+  "Deforestation": "LULC & deforestation",
+  "Drought": "Drought & degradation",
+  "Water resources": "Drought & degradation",
+  "Rangeland": "Drought & degradation",
+  "Invasive species": "Drought & degradation",
+  "Fire / burn area": "Burned area",
+  "Flood": "Flood & landslide",
+  "Landslide": "Flood & landslide",
+  "Vector-borne diseases": "Public health",
+  "Disease outbreaks": "Public health",
+  "Population (health)": "Public health"
+ },
+ "st_families": {
+  "Landsat-4": "Landsat / HLS",
+  "Landsat-5": "Landsat / HLS",
+  "Landsat-7": "Landsat / HLS",
+  "Landsat-8": "Landsat / HLS",
+  "Landsat-9": "Landsat / HLS",
+  "HLS": "Landsat / HLS",
+  "Sentinel-2": "Sentinel-2",
+  "PlanetScope": "PlanetScope / RapidEye",
+  "RapidEye": "PlanetScope / RapidEye",
+  "Sentinel-1": "SAR",
+  "ALOS": "SAR",
+  "ERS-1/2": "SAR",
+  "Envisat ASAR": "SAR",
+  "MODIS": "Coarse (>100 m)",
+  "VIIRS": "Coarse (>100 m)",
+  "AVHRR": "Coarse (>100 m)",
+  "DMSP/OLS": "Coarse (>100 m)",
+  "SMAP": "Coarse (>100 m)",
+  "SMOS": "Coarse (>100 m)",
+  "Envisat MERIS": "Coarse (>100 m)",
+  "WorldView-2": "",
+  "WorldView-3": "",
+  "Pleiades": "",
+  "SkySat": "",
+  "QuickBird-2": "",
+  "GeoEye-1": "",
+  "Aerial (Manned aircraft)": "",
+  "Aerial (UAV)": "",
+  "HJ (Huan Jing)": "",
+  "Gaofen": "",
+  "SPOT-6": "",
+  "DESIS": ""
+ },
+ "st_properties": {
+  "Landsat / HLS": "Multi-decade archive",
+  "Coarse (>100 m)": "Multi-decade archive",
+  "Sentinel-2": "High revisit",
+  "PlanetScope / RapidEye": "High revisit",
+  "SAR": "All-weather (cloud)",
+  "Weather series": "Weather time-series"
+ },
+ "iso3": {
+  "Algeria": "DZA", "Angola": "AGO", "Benin": "BEN", "Botswana": "BWA",
+  "Burkina Faso": "BFA", "Cameroon": "CMR", "Central African Republic": "CAF",
+  "Cote d'Ivoire": "CIV", "Democratic Republic of Congo": "COD", "Djibouti": "DJI",
+  "Egypt": "EGY", "Equatorial Guinea": "GNQ", "Eritrea": "ERI", "Ethiopia": "ETH",
+  "Gabon": "GAB", "Gambia": "GMB", "Ghana": "GHA", "Guinea": "GIN",
+  "Guinea Bissau": "GNB", "Kenya": "KEN", "Liberia": "LBR", "Madagascar": "MDG",
+  "Malawi": "MWI", "Mali": "MLI", "Morocco": "MAR", "Mozambique": "MOZ",
+  "Nigeria": "NGA", "Republic of Congo": "COG", "Rwanda": "RWA", "Senegal": "SEN",
+  "Sierra Leone": "SLE", "Somalia": "SOM", "South Africa": "ZAF",
+  "South Sudan": "SSD", "Sudan": "SDN", "Tanzania": "TZA", "Togo": "TGO",
+  "Tunisia": "TUN", "Uganda": "UGA", "Zambia": "ZMB", "Zimbabwe": "ZWE"
+}
+}
