@@ -1113,8 +1113,6 @@ print("         generated/numbers.tex, generated/NUMBERS.md")
 
 # ================================================================ 9. Choropleth map
 
-#!/usr/bin/env python
-# =====================================================================
 #  figures/fig-choropleth_tikz.py
 #  Generates figures/fig-choropleth.tex -- the Africa studies-per-country
 #  classed choropleth (B1), drawn natively in TikZ so the manuscript has
@@ -1135,16 +1133,15 @@ print("         generated/numbers.tex, generated/NUMBERS.md")
 #  Regenerate with:  python figures/fig-choropleth_tikz.py
 #  Edit THIS SCRIPT, never the emitted coordinates.
 # =====================================================================
-import os
+
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import box
 
-#HERE = os.path.dirname(os.path.abspath(__file__))
-#ROOT = os.path.normpath(os.path.join(HERE, "..", "..", "Excel_analysis", "20-06"))
-GEO = os.path.join(ROOT, "Africa_Countries.geojson")
-#XL = os.path.join(ROOT, "selected_articles_only.xlsx")
-OUT = os.path.join(HERE, "fig-choropleth.tex")
+# Data lives in the shared source/ folder, like every other figure here.
+GEO = HERE / "source" / "Africa_Countries.geojson"
+XL  = HERE / "source" / "selected_articles_only.xlsx"
+OUT = HERE / "fig-choropleth.tex"
 
 # ---- locked B1 spec -------------------------------------------------
 BIN_EDGES = [1, 3, 6, 10, 19, 25]
