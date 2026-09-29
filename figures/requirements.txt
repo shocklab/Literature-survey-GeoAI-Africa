@@ -1,6 +1,0 @@
-# Dependencies for figures/build_figures.py (data-driven figure generation)
-# Install with:  pip install -r requirements.txt
-openpyxl>=3.1      # read the .xlsx workbooks
-pandas>=2.0        # tabular handling
-geopandas>=0.14    # read the geojson; .union_all() needs >=0.14
-shapely>=2.0       # geometry ops (box, buffer, difference)
