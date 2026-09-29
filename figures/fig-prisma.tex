@@ -1,0 +1,263 @@
+% =====================================================================
+%  figures/fig-prisma.tex   --  PRISMA 2020 flow diagram
+%  Requires: tikz + libraries arrows.meta, positioning, calc, fit, backgrounds
+%            and figures/style.tex for the colours.
+%
+%  NOTE ON NUMBERS -----------------------------------------------------
+%  Derived from Article_01_review/Full review_articles_175_articles.xlsx
+%  (175 rows; the Selection column splits 102 Key / 73 Exclude) and
+%  original_back_reference(BR).xlsx (26 rows).
+%        175 assessed - 73 excluded = 102 ;  102 + 36 citation = 138
+%  The 36 comprise the 26 original backreferences plus 10 added later
+%  from Aisha's reference list and during the review itself (Ian, 24 Aug).
+%  The period box reads "Outside target period" rather than naming years:
+%  at print size a year range butted against its count misreads (2026 + 27
+%  looks like 2027), and Section 2.2 states the window in the prose anyway.
+% =====================================================================
+\begin{comment}
+\begin{figure*}[!t]
+\centering
+\resizebox{\textwidth}{!}{%
+\hyphenpenalty=10000\exhyphenpenalty=10000\relax
+\begin{tikzpicture}[
+  font=\sffamily\Large,
+  bx/.style ={draw=jsRule, line width=0.45pt, rounded corners=2pt, fill=white,
+              text width=46mm, align=left, inner sep=6pt, minimum height=13mm,
+              node font=\sffamily\Large},
+  bxo/.style={bx, fill=pOtherFill},
+  hd/.style ={rounded corners=2pt, inner xsep=10pt, inner ysep=5pt,
+              align=center, font=\sffamily\Large\bfseries},
+  ar/.style ={-{Latex[length=2.2mm,width=1.6mm]}, draw=jsRule, line width=0.6pt},
+  grp/.style={draw=none, fill=none, inner sep=0pt},
+]
+
+% ---------------- IDENTIFICATION -------------------------------------
+\node[bx] (id1)
+  {\textbf{Records identified}\\ (n = 928)\\[3pt]
+   {\large
+   ACM \hfill 534\\
+   Scopus \hfill 155\\
+   Web of Science \hfill 115\\
+   IEEE Xplore \hfill 74\\
+   Google Scholar Labs \hfill 50\par}};
+
+\node[bx, right=14mm of id1] (id2)
+  {\textbf{Records removed}\\ \textbf{before screening}\\ (n = 605)\\[3pt]
+   {\large
+   Duplicates \hfill 106\\
+   Outside target period \hfill 27\\
+   ACM, $<2$ keywords \hfill 472\par}};
+
+% ---------------- SCREENING ------------------------------------------
+\node[bx, below=12mm of id1] (scr1) {\textbf{Records screened}\\ (n = 323)};
+\node[bx] (scr2) at (id2 |- scr1)
+  {\textbf{Records excluded}\\ (n = 146)\\[3pt]
+   {\large
+   Off-theme \hfill 90\\
+   Global scope \hfill 23\\
+   Reviews \hfill 17\\
+   Outside Africa \hfill 16\par}};
+
+\node[bx, below=12mm of scr1] (ret1) {\textbf{Reports sought}\\ \textbf{for retrieval}\\ (n = 177)};
+\node[bx] (ret2) at (id2 |- ret1) {\textbf{Reports not retrieved}\\ (n = 2)};
+
+\node[bx, below=24mm of ret1] (elg1) {\textbf{Reports assessed}\\ \textbf{for eligibility}\\ (n = 175)};
+\node[bx] (elg2) at (id2 |- elg1)
+  {\textbf{Reports excluded}\\ (n = 73)\\[3pt]
+   {\large
+   Off-theme \hfill 24\\
+   Insufficient depth \hfill 22\\
+   No EO data \hfill 11\\
+   Publication type \hfill 8\\
+   Superseded \hfill 4\\
+   Other \hfill 4\par}};
+
+% ---------------- OTHER METHODS --------------------------------------
+\node[bxo, right=20mm of id2] (o1)
+  {\textbf{Records identified}\\ \textbf{via citation searching}\\ (n = 36)};
+\node[bxo] (o2) at (o1 |- ret1) {\textbf{Reports sought}\\ \textbf{for retrieval}\\ (n = 36)};
+\node[bxo, right=14mm of o2] (o3) {\textbf{Reports not retrieved}\\ (n = 0)};
+\node[bxo] (o4) at (o1 |- elg1) {\textbf{Reports assessed}\\ \textbf{for eligibility}\\ (n = 36)};
+\node[bxo] (o5) at (o3 |- elg1) {\textbf{Reports excluded}\\ (n = 0)};
+
+% ---------------- INCLUDED -------------------------------------------
+\node[bx, below=16mm of elg1, fill=pDbHead!50, text width=92mm] (inc)
+  {\centering\textbf{Studies included in the review}\\ (n = 138)\\[2pt]
+   {\large 102 from databases $+$ 36 from citation searching\par}\par};
+
+% ---------------- arrows ---------------------------------------------
+\draw[ar] (id1)  -- (id2);
+\draw[ar] (id1)  -- (scr1);
+\draw[ar] (scr1) -- (scr2);
+\draw[ar] (scr1) -- (ret1);
+\draw[ar] (ret1) -- (ret2);
+\draw[ar] (ret1) -- (elg1);
+\draw[ar] (elg1) -- (elg2);
+\draw[ar] (elg1) -- (inc);
+\draw[ar] (o1)   -- (o2);
+\draw[ar] (o2)   -- (o3);
+\draw[ar] (o2)   -- (o4);
+\draw[ar] (o4)   -- (o5);
+\draw[ar] (o4.south) |- (inc.east);   % down, then left into the included box
+
+% ---------------- column headers -------------------------------------
+\node[grp, fit=(id1)(id2)] (gdb) {};
+\node[grp, fit=(o1)(o3)]   (goth) {};
+\node[hd, fill=pDbHead]    at ($(gdb.north)+(0,10mm)$)
+  {Identification of studies via databases};
+\node[hd, fill=pOtherHead] at ($(goth.north)+(0,10mm)$)
+  {Identification of studies via other methods};
+
+% ---------------- phase bands ----------------------------------------
+\begin{scope}[on background layer]
+  \node[grp, fit=(id1)(id2)(o1), inner ysep=2pt] (fA) {};
+  \node[grp, fit=(scr1)(elg2)(o5), inner ysep=2pt] (fB) {};
+  \node[grp, fit=(inc), inner ysep=2pt] (fC) {};
+  \foreach \f/\lbl in {fA/Identification, fB/Screening, fC/Included}{%
+    \fill[pBand, rounded corners=2pt]
+      ($(\f.north west)+(-13mm,0)$) rectangle ($(\f.south west)+(-5mm,0)$);
+    \node[rotate=90, font=\sffamily\Large\bfseries, text=white]
+      at ($(\f.west)+(-9mm,0)$) {\lbl};
+  }
+\end{scope}
+
+\end{tikzpicture}}
+\caption{Identification, screening and selection of studies, following the PRISMA 2020
+statement. Shaded boxes show the parallel citation-searching branch.}
+\label{fig:Prisma_diagram}
+\end{figure*}
+\end{comment}
+
+
+% =====================================================================
+%  figures/fig-prisma.tex   --  PRISMA 2020 flow diagram
+%  Requires: tikz + libraries arrows.meta, positioning, calc, fit, backgrounds
+%            and figures/style.tex for the colours.
+%
+%  NOTE ON NUMBERS -----------------------------------------------------
+%  Derived from Article_01_review/Full review_articles_175_articles.xlsx
+%  (175 rows; the Selection column splits 102 Key / 73 Exclude) and
+%  original_back_reference(BR).xlsx (26 rows).
+%        175 assessed - 73 excluded = 102 ;  102 + 36 citation = 138
+%  The 36 comprise the 26 original backreferences plus 10 added later
+%  from Aisha's reference list and during the review itself (Ian, 24 Aug).
+%  "Removed before screening" (652) merges the source-limit filters (date,
+%  document type, language = 62; ACM <2-keyword = 478) with duplicates (112),
+%  giving 928 - 652 = 276 unique screened. The per-database 928 -> 388 funnel
+%  is documented in the appendix search-results table. Section 2.2 states the
+%  date window in prose.
+% =====================================================================
+\begin{figure*}
+    
+
+\centering
+\resizebox{\textwidth}{!}{%
+\hyphenpenalty=10000\exhyphenpenalty=10000\relax
+\begin{tikzpicture}[
+  font=\sffamily\Large,
+  bx/.style ={draw=jsRule, line width=0.45pt, rounded corners=2pt, fill=white,
+              text width=46mm, align=left, inner sep=6pt, minimum height=13mm,
+              node font=\sffamily\Large},
+  bxo/.style={bx, fill=pOtherFill},
+  bxw/.style ={bx, text width=56mm},
+  bxL/.style ={bx, text width=62mm},   % wide box for the detail lists
+  hd/.style ={rounded corners=2pt, inner xsep=10pt, inner ysep=5pt,
+              align=center, font=\sffamily\Large\bfseries},
+  ar/.style ={-{Latex[length=2.2mm,width=1.6mm]}, draw=jsRule, line width=0.6pt},
+  grp/.style={draw=none, fill=none, inner sep=0pt},
+]
+
+% ---------------- IDENTIFICATION -------------------------------------
+\node[bx] (id1)
+  {\textbf{Records identified}\\ (n = 928)\\[3pt]
+   {\large
+   ACM \hfill 534\\
+   Scopus \hfill 155\\
+   Web of Science \hfill 115\\
+   IEEE Xplore \hfill 74\\
+   Google Scholar Labs \hfill 50\par}};
+
+\node[bxL, right=12mm of id1] (id2)
+  {\textbf{Records removed}\\ \textbf{before screening}\\ (n = 655)\\[3pt]
+   {\large
+   Duplicates \hfill 108\\
+   Date/type/language limits \hfill 65\\
+   ACM, $<2$ keywords \hfill 482\par}};
+
+% ---------------- SCREENING ------------------------------------------
+\node[bx, below=12mm of id1] (scr1) {\textbf{Records screened}\\ (n = 273)};
+\node[bxL] (scr2) at (id2 |- scr1)
+  {\textbf{Records excluded}\\ (n = 96)\\[3pt]
+   {\large
+   Out of scope \hfill 40\\
+   Global scope \hfill 23\\
+   Reviews \hfill 17\\
+   Outside Africa \hfill 16\par}};
+
+\node[bx, below=12mm of scr1] (ret1) {\textbf{Reports sought}\\ \textbf{for retrieval}\\ (n = 177)};
+\node[bxL] (ret2) at (id2 |- ret1) {\textbf{Reports not retrieved}\\ (n = 2)};
+
+\node[bx, below=24mm of ret1] (elg1) {\textbf{Reports assessed}\\ \textbf{for eligibility}\\ (n = 175)};
+\node[bxL] (elg2) at (id2 |- elg1)
+  {\textbf{Reports excluded}\\ (n = 73)\\[3pt]
+   {\large
+   Off-theme \hfill 28\\
+   Insufficient depth \hfill 22\\
+   No EO data \hfill 11\\
+   Publication type \hfill 8\\
+   Superseded \hfill 4\par}};
+
+% ---------------- OTHER METHODS --------------------------------------
+\node[bxo, right=34mm of id2] (o1)
+  {\textbf{Records identified}\\ \textbf{via citation searching}\\ (n = 36)};
+\node[bxo] (o2) at (o1 |- ret1) {\textbf{Reports sought}\\ \textbf{for retrieval}\\ (n = 36)};
+\node[bxo, right=14mm of o2] (o3) {\textbf{Reports not retrieved}\\ (n = 0)};
+\node[bxo] (o4) at (o1 |- elg1) {\textbf{Reports assessed}\\ \textbf{for eligibility}\\ (n = 36)};
+\node[bxo] (o5) at (o3 |- elg1) {\textbf{Reports excluded}\\ (n = 0)};
+
+% ---------------- INCLUDED -------------------------------------------
+\node[bx, below=16mm of elg1, fill=pDbHead!50, text width=92mm] (inc)
+  {\centering\textbf{Studies included in the review}\\ (n = 138)\\[2pt]
+   {\large 102 from databases $+$ 36 from citation searching\par}\par};
+
+% ---------------- arrows ---------------------------------------------
+\draw[ar] (id1)  -- (id2);
+\draw[ar] (id1)  -- (scr1);
+\draw[ar] (scr1) -- (scr2);
+\draw[ar] (scr1) -- (ret1);
+\draw[ar] (ret1) -- (ret2);
+\draw[ar] (ret1) -- (elg1);
+\draw[ar] (elg1) -- (elg2);
+\draw[ar] (elg1) -- (inc);
+\draw[ar] (o1)   -- (o2);
+\draw[ar] (o2)   -- (o3);
+\draw[ar] (o2)   -- (o4);
+\draw[ar] (o4)   -- (o5);
+\draw[ar] (o4.south) |- (inc.east);   % down, then left into the included box
+
+% ---------------- column headers -------------------------------------
+\node[grp, fit=(id1)(id2)] (gdb) {};
+\node[grp, fit=(o1)(o3)]   (goth) {};
+\node[hd, fill=pDbHead]    at ($(gdb.north)+(0,10mm)$)
+  {Identification of studies via databases};
+\node[hd, fill=pOtherHead] at ($(goth.north)+(0,10mm)$)
+  {Identification of studies via other methods};
+
+% ---------------- phase bands ----------------------------------------
+\begin{scope}[on background layer]
+  \node[grp, fit=(id1)(id2)(o1), inner ysep=2pt] (fA) {};
+  \node[grp, fit=(scr1)(elg2)(o5), inner ysep=2pt] (fB) {};
+  \node[grp, fit=(inc), inner ysep=2pt] (fC) {};
+  \foreach \f/\lbl in {fA/Identification, fB/Screening, fC/Included}{%
+    \fill[pBand, rounded corners=2pt]
+      ($(\f.north west)+(-13mm,0)$) rectangle ($(\f.south west)+(-5mm,0)$);
+    \node[rotate=90, font=\sffamily\Large\bfseries, text=white]
+      at ($(\f.west)+(-9mm,0)$) {\lbl};
+  }
+\end{scope}
+
+      \end{tikzpicture}}
+\caption{Identification, screening and selection of studies, following the PRISMA 2020
+statement. Shaded boxes show the parallel citation-searching branch.}
+\label{fig:Prisma_diagram}
+\end{figure*}
