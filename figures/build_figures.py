@@ -328,7 +328,7 @@ coords = " ".join(f"({y},{years[y]})" for y in yk)
 \addplot[draw=none, fill=jsBlue] coordinates {%s};
 \end{axis}
 \end{tikzpicture}
-\caption{Publications per year across the %d reviewed studies, %s to %s.
+\caption{Publications per year across the %d reviewed studies, %s--%s.
 The %s count covers January to 19 May only, when the search closed.}
 \label{fig:yearly_studies}
 \end{figure}
