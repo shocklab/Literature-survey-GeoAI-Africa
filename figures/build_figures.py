@@ -1286,7 +1286,7 @@ HEAD = r"""% ===================================================================
 % =====================================================================
 """
 
-MID = r"""\begin{figure}[htbp]
+MID = r"""\begin{figure}[pos=htbp]
 \centering
 \resizebox{0.8\linewidth}{!}{%
 \begin{tikzpicture}[font=\sffamily]
