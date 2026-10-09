@@ -1096,6 +1096,10 @@ for _ix in ("NDVI", "NDWI", "EVI"):
 macros["nJournalRemoteSensing"] = dict(jr)["Remote Sensing"]
 for _s, _v in _ds.items():
     macros["nDEM" + _s] = len(_v)
+# studies per satellite sensor, for the No. column of the supplementary's EO table
+for _s, _v in sens.items():
+    if LK["sensors"][_s][1] == "Satellite":
+        macros["nSensor" + _s] = len(_v)
 
 # ---------------------------------------------------------------- PRISMA
 # Search and screening counts from the PRISMA sheet; the database / citation
