@@ -8,18 +8,19 @@ refers to them as plain text, which is what Elsevier wants for supplementary
 material but gives LaTeX no way to catch drift. Run this after moving,
 adding or deleting a supplementary table.
 
-    python3 figures/check_supp_refs.py
+    python3 figures/check_supp_refs.py               # from the manuscript folder
+    python3 figures/check_supp_refs.py <folder>      # folder holding the .tex files
 """
 import re
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-MAIN = next((p for p in (HERE.parent.parent / "manuscript_review.tex",
-                         HERE.parent.parent / "main.tex") if p.exists()), None)
-if MAIN is None:
-    sys.exit("main text not found (looked for manuscript_review.tex, main.tex)")
-SUPP = HERE.parent.parent / "supplementary_S1.tex"   # claude/supplementary_S1.tex
+ROOT = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else HERE.parent
+MAIN = next((p for p in (ROOT / "manuscript_review.tex", ROOT / "main.tex") if p.exists()), None)
+SUPP = ROOT / "supplementary_S1.tex"
+if MAIN is None or not SUPP.exists():
+    sys.exit(f"manuscript_review.tex (or main.tex) and supplementary_S1.tex not found in {ROOT}")
 
 # What each S-number is expected to be about, keyed by the supplementary's own
 # label. Edit this when a table is added or its subject changes.
@@ -28,6 +29,7 @@ EXPECTED = {
     "tab:eo_indices": "EO-derived features and indices",
     "tab:dem_derivatives": "DEM derivatives / terrain",
     "tab:climate_datasets_compact": "climate and weather products",
+    "tab:climate_indices": "climate indices",
     "tab:pop_socio": "population and socioeconomic data",
     "tab:agri_data": "agricultural datasets",
     "tab:disaster_data": "disaster datasets",
