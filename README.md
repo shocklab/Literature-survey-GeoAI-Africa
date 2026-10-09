@@ -8,13 +8,13 @@ Each release is archived on Zenodo: https://doi.org/10.5281/zenodo.22745736 reso
 
 | Path | What it is |
 |---|---|
-| `figures/source/Reviewed_articles_only.xlsx` | The included studies and their coded attributes. `Studies` has one row per study; `Selected_articles` holds the full extraction; the `*_long` sheets list methods, EO data, indices, countries, weather and DEM sources, tasks, platforms and journals one entry per row; `Abbreviations` expands the short forms. |
+| `figures/source/Reviewed_articles_only.xlsx` | The included studies and their coded attributes. `Studies` has one row per study; `Selected_articles` holds the full extraction; the `*_long` sheets list methods, EO data, indices, countries, weather and DEM sources, tasks, platforms and journals one entry per row; `PRISMA` holds the search and screening counts; `Abbreviations` expands the short forms. |
 | `figures/source/lookups.json` | Mappings from the names used in the workbook to the categories in the figures (methods, sensors, platforms, weather products, repository types, spatio-temporal categories, ISO3 country codes). |
 | `figures/source/Africa_Countries.geojson` | Country boundaries for the map. |
 | `figures/build_figures.py` | Generates the figures, and the counts quoted in the text, from the three source files. |
 | `figures/check_supp_refs.py` | Checks that each "Table S*n*" in the manuscript refers to a table the supplementary defines. |
 | `figures/style.tex` | Colours and styles shared by the figures. |
-| `figures/fig-*.tex` | The figures, as TikZ and pgfplots. `fig-prisma.tex` is drawn by hand; the rest are generated. |
+| `figures/fig-*.tex` | The figures, as TikZ and pgfplots. `fig-prisma.tex` is drawn by hand with its counts taken from `numbers.tex`; the rest are generated. |
 
 ## Generating the figures and counts
 

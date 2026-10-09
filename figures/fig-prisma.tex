@@ -135,17 +135,12 @@ statement. Shaded boxes show the parallel citation-searching branch.}
 %            and figures/style.tex for the colours.
 %
 %  NOTE ON NUMBERS -----------------------------------------------------
-%  Derived from Article_01_review/Full review_articles_175_articles.xlsx
-%  (175 rows; the Selection column splits 102 Key / 73 Exclude) and
-%  original_back_reference(BR).xlsx (26 rows).
-%        175 assessed - 73 excluded = 102 ;  102 + 36 citation = 138
-%  The 36 comprise the 26 original backreferences plus 10 added later
-%  from Aisha's reference list and during the review itself (Ian, 24 Aug).
-%  "Removed before screening" (652) merges the source-limit filters (date,
-%  document type, language = 62; ACM <2-keyword = 478) with duplicates (112),
-%  giving 928 - 652 = 276 unique screened. The per-database 928 -> 388 funnel
-%  is documented in the appendix search-results table. Section 2.2 states the
-%  date window in prose.
+%  Every count is a macro from figures/numbers.tex, which build_figures.py
+%  writes from the PRISMA sheet of Reviewed_articles_only.xlsx (search and
+%  screening counts) and the Source column of Selected_articles (BR =
+%  citation searching). The generator checks that databases + citation
+%  searching = \nStudies. The per-database funnel is the appendix
+%  search-results table.
 % =====================================================================
 \begin{figure*}
     
@@ -169,56 +164,56 @@ statement. Shaded boxes show the parallel citation-searching branch.}
 
 % ---------------- IDENTIFICATION -------------------------------------
 \node[bx] (id1)
-  {\textbf{Records identified}\\ (n = 928)\\[3pt]
+  {\textbf{Records identified}\\ (n = \nSearchReturned)\\[3pt]
    {\large
-   ACM \hfill 534\\
-   Scopus \hfill 155\\
-   Web of Science \hfill 115\\
-   IEEE Xplore \hfill 74\\
-   Google Scholar Labs \hfill 50\par}};
+   ACM \hfill \nSearchACMReturned\\
+   Scopus \hfill \nSearchScopusReturned\\
+   Web of Science \hfill \nSearchWoSReturned\\
+   IEEE Xplore \hfill \nSearchIEEEReturned\\
+   Google Scholar Labs \hfill \nSearchGSLReturned\par}};
 
 \node[bxL, right=12mm of id1] (id2)
-  {\textbf{Records removed}\\ \textbf{before screening}\\ (n = 655)\\[3pt]
+  {\textbf{Records removed}\\ \textbf{before screening}\\ (n = \nPrismaRemovedBeforeScreening)\\[3pt]
    {\large
-   Duplicates \hfill 108\\
-   Date/type/language limits \hfill 65\\
-   ACM, $<2$ keywords \hfill 482\par}};
+   Duplicates \hfill \nPrismaDuplicates\\
+   Date/type/language limits \hfill \nSearchLimits\\
+   ACM, $<2$ keywords \hfill \nSearchACMKeyword\par}};
 
 % ---------------- SCREENING ------------------------------------------
-\node[bx, below=12mm of id1] (scr1) {\textbf{Records screened}\\ (n = 273)};
+\node[bx, below=12mm of id1] (scr1) {\textbf{Records screened}\\ (n = \nPrismaScreened)};
 \node[bxL] (scr2) at (id2 |- scr1)
-  {\textbf{Records excluded}\\ (n = 96)\\[3pt]
+  {\textbf{Records excluded}\\ (n = \nPrismaScreenExcluded)\\[3pt]
    {\large
-   Out of scope \hfill 40\\
-   Global scope \hfill 23\\
-   Reviews \hfill 17\\
-   Outside Africa \hfill 16\par}};
+   Out of scope \hfill \nPrismaScreenExcludedOutofscope\\
+   Global scope \hfill \nPrismaScreenExcludedGlobalscope\\
+   Reviews \hfill \nPrismaScreenExcludedReviews\\
+   Outside Africa \hfill \nPrismaScreenExcludedOutsideAfrica\par}};
 
-\node[bx, below=12mm of scr1] (ret1) {\textbf{Reports sought}\\ \textbf{for retrieval}\\ (n = 177)};
-\node[bxL] (ret2) at (id2 |- ret1) {\textbf{Reports not retrieved}\\ (n = 2)};
+\node[bx, below=12mm of scr1] (ret1) {\textbf{Reports sought}\\ \textbf{for retrieval}\\ (n = \nPrismaSought)};
+\node[bxL] (ret2) at (id2 |- ret1) {\textbf{Reports not retrieved}\\ (n = \nPrismaNotRetrieved)};
 
-\node[bx, below=24mm of ret1] (elg1) {\textbf{Reports assessed}\\ \textbf{for eligibility}\\ (n = 175)};
+\node[bx, below=24mm of ret1] (elg1) {\textbf{Reports assessed}\\ \textbf{for eligibility}\\ (n = \nPrismaAssessed)};
 \node[bxL] (elg2) at (id2 |- elg1)
-  {\textbf{Reports excluded}\\ (n = 73)\\[3pt]
+  {\textbf{Reports excluded}\\ (n = \nPrismaFullTextExcluded)\\[3pt]
    {\large
-   Off-theme \hfill 28\\
-   Insufficient depth \hfill 22\\
-   No EO data \hfill 11\\
-   Publication type \hfill 8\\
-   Superseded \hfill 4\par}};
+   Off-theme \hfill \nPrismaFullTextExcludedOfftheme\\
+   Insufficient depth \hfill \nPrismaFullTextExcludedInsufficientdepth\\
+   No EO data \hfill \nPrismaFullTextExcludedNoEOdata\\
+   Publication type \hfill \nPrismaFullTextExcludedPublicationtype\\
+   Superseded \hfill \nPrismaFullTextExcludedSuperseded\par}};
 
 % ---------------- OTHER METHODS --------------------------------------
 \node[bxo, right=34mm of id2] (o1)
-  {\textbf{Records identified}\\ \textbf{via citation searching}\\ (n = 36)};
-\node[bxo] (o2) at (o1 |- ret1) {\textbf{Reports sought}\\ \textbf{for retrieval}\\ (n = 36)};
+  {\textbf{Records identified}\\ \textbf{via citation searching}\\ (n = \nPrismaCitation)};
+\node[bxo] (o2) at (o1 |- ret1) {\textbf{Reports sought}\\ \textbf{for retrieval}\\ (n = \nPrismaCitation)};
 \node[bxo, right=14mm of o2] (o3) {\textbf{Reports not retrieved}\\ (n = 0)};
-\node[bxo] (o4) at (o1 |- elg1) {\textbf{Reports assessed}\\ \textbf{for eligibility}\\ (n = 36)};
+\node[bxo] (o4) at (o1 |- elg1) {\textbf{Reports assessed}\\ \textbf{for eligibility}\\ (n = \nPrismaCitation)};
 \node[bxo] (o5) at (o3 |- elg1) {\textbf{Reports excluded}\\ (n = 0)};
 
 % ---------------- INCLUDED -------------------------------------------
 \node[bx, below=16mm of elg1, fill=pDbHead!50, text width=92mm] (inc)
-  {\centering\textbf{Studies included in the review}\\ (n = 138)\\[2pt]
-   {\large 102 from databases $+$ 36 from citation searching\par}\par};
+  {\centering\textbf{Studies included in the review}\\ (n = \nStudies)\\[2pt]
+   {\large \nPrismaDatabase{} from databases $+$ \nPrismaCitation{} from citation searching\par}\par};
 
 % ---------------- arrows ---------------------------------------------
 \draw[ar] (id1)  -- (id2);

@@ -14,6 +14,8 @@ Writes  figures/fig-yearly.tex
         figures/fig-journals.tex
         figures/fig-spatiotemporal.tex
         figures/fig-resolution.tex
+        figures/fig-infrastructure.tex
+        figures/fig-choropleth.tex
         figures/generated/numbers.tex     (LaTeX macros for use in the prose)
         figures/generated/NUMBERS.md      (every derived number + paper comparison)
 
@@ -21,8 +23,9 @@ The generated .tex files are plain TikZ/pgfplots with no external dependencies,
 so they compile on Overleaf unchanged. Re-run this locally after any
 spreadsheet edit and re-upload the generated files.
 
+Drawn by hand: fig-prisma.tex, whose counts are macros from numbers.tex (the
+PRISMA sheet and Selected_articles' Source column).
 NOT generated (no source column exists for these):
-  fig-prisma.tex   - screening counts; awaiting confirmation of the split
   fig-imagery.tex  - panels (b) imagery access and (c) sensor/scale strategy
 """
 import collections
@@ -416,7 +419,8 @@ for r in ML:
     famcat[f] = c
 
 # families named individually in the prose, so the counts cannot drift
-for _f, _k in (("SVM", "nSVM"), ("Decision tree", "nDecisionTree")):
+for _f, _k in (("SVM", "nSVM"), ("Decision tree", "nDecisionTree"),
+               ("Feedforward network", "nFeedforward")):
     if _f in fam:
         macros[_k] = len(fam[_f])
 # Random Forest the algorithm is a Method; the "Random forest" family also holds
@@ -1067,6 +1071,95 @@ notes.append(("Platforms", "; ".join(f"{k} {n}" for k, n in reversed(_plc)) +
 notes.append(("Open science", f"repository {macros['nRepository']}; data link {macros['nDataLink']}; "
               f"interactive {macros['nInteractive']}", "PNG caption: 25 repositories"))
 
+# ---------------------------------------------------------------- counts named in the prose
+# Shares of each domain and year, the top three countries by ISO3 code, and the
+# individual sources the Results and the DEM table name.
+for _d in list(macros):
+    if _d.startswith("nDom") or _d.startswith("nYear"):
+        macros["pct" + _d[1:]] = "%.1f" % (100 * macros[_d] / N)
+macros["nDomAgricultureAndUrban"] = macros["nDomAgriculture"] + macros["nDomUrbanInfrastructure"]
+_iso = LK["iso3"]
+for _c, _v in top3:
+    macros["nCountry" + _iso[_c]] = len(_v)
+    macros["pctCountry" + _iso[_c]] = "%.1f" % (100 * len(_v) / n_co)
+_africa = {f["properties"]["ISO_3DIGIT"]
+           for f in json.loads((HERE / "source" / "Africa_Countries.geojson").read_text())["features"]}
+_outside = sorted(set(_iso[c] for c in cty) - _africa)
+if _outside:
+    sys.exit("countries not in Africa_Countries.geojson: %s" % _outside)
+macros["nAfricanCountries"] = len(_africa)
+macros["nCountriesAbsent"] = len(_africa) - len(cty)
+macros["nAirborne"] = len(airb)
+# index use among the satellite studies, as the Results paragraph on indices reports it
+for _ix in ("NDVI", "NDWI", "EVI"):
+    macros[f"n{_ix}Satellite"] = len(ndvi.get(_ix, set()) & sat)
+macros["nJournalRemoteSensing"] = dict(jr)["Remote Sensing"]
+for _s, _v in _ds.items():
+    macros["nDEM" + _s] = len(_v)
+
+# ---------------------------------------------------------------- PRISMA
+# Search and screening counts from the PRISMA sheet; the database / citation
+# split from Selected_articles' Source column ("BR" = citation searching).
+PR = sheet("PRISMA")
+_pr = collections.defaultdict(dict)
+for _r in PR:
+    _pr[_r["Stage"]][_r["Item"]] = int(_r["Count"])
+DBS = (("Web of Science", "WoS"), ("Scopus", "Scopus"), ("IEEE Xplore", "IEEE"),
+       ("ACM Digital Library", "ACM"), ("Google Scholar Labs", "GSL"))
+STAGES = (("Returned", "Returned"), ("In 2015-2026", "Date"), ("Document type", "Type"),
+          ("English", "English"), ("Carried forward", "Carried"))
+for _db, _dk in DBS:
+    _vals = [_pr[_st][_db] for _st, _ in STAGES]
+    if any(b > a for a, b in zip(_vals, _vals[1:])):
+        sys.exit("PRISMA: %s counts rise between stages: %s" % (_db, _vals))
+    for (_st, _sk), _v in zip(STAGES, _vals):
+        macros[f"nSearch{_dk}{_sk}"] = _v
+for _st, _sk in STAGES:
+    macros[f"nSearch{_sk}"] = sum(_pr[_st][db] for db, _ in DBS)
+_ieee = _pr["IEEE Xplore by type"]
+if (_ieee["Conference, returned"] + _ieee["Journal, returned"] != macros["nSearchIEEEReturned"]
+        or _ieee["Conference, in 2015-2026"] + _ieee["Journal, in 2015-2026"] != macros["nSearchIEEEDate"]):
+    sys.exit("PRISMA: IEEE Xplore conference + journal counts do not match its totals")
+macros["nSearchIEEEConfReturned"] = _ieee["Conference, returned"]
+macros["nSearchIEEEJournalReturned"] = _ieee["Journal, returned"]
+macros["nSearchIEEEConfDate"] = _ieee["Conference, in 2015-2026"]
+macros["nSearchIEEEJournalDate"] = _ieee["Journal, in 2015-2026"]
+_others = [macros[f"nSearch{dk}Returned"] for _, dk in DBS if dk != "ACM"]
+macros["nSearchOtherReturnedMin"], macros["nSearchOtherReturnedMax"] = min(_others), max(_others)
+# The ACM document-type column is the two-search-term filter (table footnote b).
+macros["nSearchACMKeyword"] = macros["nSearchACMDate"] - macros["nSearchACMType"]
+macros["nSearchLimits"] = macros["nSearchReturned"] - macros["nSearchCarried"] - macros["nSearchACMKeyword"]
+macros["nPrismaDuplicates"] = _pr["Duplicates removed"]["All databases"]
+macros["nPrismaRemovedBeforeScreening"] = (macros["nPrismaDuplicates"] + macros["nSearchLimits"]
+                                           + macros["nSearchACMKeyword"])
+macros["nPrismaScreened"] = macros["nSearchCarried"] - macros["nPrismaDuplicates"]
+for _st, _k in (("Excluded at screening", "nPrismaScreenExcluded"),
+                ("Excluded at full text", "nPrismaFullTextExcluded")):
+    macros[_k] = sum(_pr[_st].values())
+    for _reason, _v in _pr[_st].items():
+        macros[_k + _reason] = _v
+macros["nPrismaSought"] = macros["nPrismaScreened"] - macros["nPrismaScreenExcluded"]
+macros["nPrismaNotRetrieved"] = sum(_pr["Not retrieved"].values())
+macros["nPrismaAssessed"] = macros["nPrismaSought"] - macros["nPrismaNotRetrieved"]
+macros["nPrismaDatabase"] = macros["nPrismaAssessed"] - macros["nPrismaFullTextExcluded"]
+_src = [str(_osa[normt(r["Title"])].get("Source") or "").strip() for r in STUDIES]
+macros["nPrismaCitation"] = sum(1 for s in _src if s.upper() == "BR")
+if macros["nPrismaDatabase"] + macros["nPrismaCitation"] != N:
+    sys.exit("PRISMA: %d from databases + %d from citation searching != %d studies"
+             % (macros["nPrismaDatabase"], macros["nPrismaCitation"], N))
+_nosrc = [r["Title"] for r, s in zip(STUDIES, _src) if not s]
+if _nosrc:
+    print("WARNING: no Source in Selected_articles (counted with the database search): %s" % _nosrc)
+notes.append(("PRISMA",
+              f"identified {macros['nSearchReturned']}; removed before screening "
+              f"{macros['nPrismaRemovedBeforeScreening']} (duplicates {macros['nPrismaDuplicates']}, "
+              f"limits {macros['nSearchLimits']}, ACM keyword filter {macros['nSearchACMKeyword']}); "
+              f"screened {macros['nPrismaScreened']}; excluded {macros['nPrismaScreenExcluded']}; "
+              f"sought {macros['nPrismaSought']}; not retrieved {macros['nPrismaNotRetrieved']}; "
+              f"assessed {macros['nPrismaAssessed']}; excluded {macros['nPrismaFullTextExcluded']}; "
+              f"databases {macros['nPrismaDatabase']} + citation searching {macros['nPrismaCitation']} = {N}",
+              f"{len(_nosrc)} studies with no Source"))
+
 # ---------------------------------------------------------------- outputs
 # Percentages quoted in the prose. Emitted without the % sign; write
 # \pctRandomForest\% in the text.
@@ -1093,9 +1186,16 @@ for _k, _num, _den in (("pctRandomForest", "nRandomForest", "nClassical"),
                        ("pctDataLink", "nDataLink", "nStudies"),
                        ("pctSpanReported", "nSpanReported", "nStudies"),
                        ("pctCHIRPS", "nCHIRPS", "nWeatherStudies"),
-                       ("pctSRTM", "nSRTM", "nDEMStudies")):
+                       ("pctSRTM", "nSRTM", "nDEMStudies"),
+                       ("pctDomAgricultureAndUrban", "nDomAgricultureAndUrban", "nStudies"),
+                       ("pctNDVISatellite", "nNDVISatellite", "nSatellite"),
+                       ("pctNDWISatellite", "nNDWISatellite", "nSatellite"),
+                       ("pctEVISatellite", "nEVISatellite", "nSatellite")):
     macros[_k] = "%.1f" % (100 * macros[_num] / macros[_den])
 
+_names = collections.Counter(macroname(k) for k in macros)
+if any(c > 1 for c in _names.values()):
+    sys.exit("two counts share a macro name: %s" % [n for n, c in _names.items() if c > 1])
 (GEN / "numbers.tex").write_text(
     BANNER + "%% \\input this to use the counts in prose, e.g. \\nStudies\n" +
     "".join("\\newcommand{\\%s}{%s}\n" % (macroname(k), v)
