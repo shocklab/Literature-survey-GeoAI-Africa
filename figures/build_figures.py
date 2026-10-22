@@ -547,6 +547,9 @@ macros["nSupervisedOnly"] = excl["Supervised"]
 # nNonSupervised and no study is double-counted. nMethodsRecorded is smaller
 # than nStudies when a study records no method at all.
 macros["nMethodsRecorded"] = len(assign)
+# the studies with no learning algorithm at all (object-based image analysis
+# alone), so nSupervisedOnly + nNonSupervised + nNoLearningParadigm = nStudies
+macros["nNoLearningParadigm"] = N - len(assign)
 macros["nNonSupervised"] = len(assign) - excl["Supervised"]
 for _p, _k in (("Self-supervised", "nSelfSupervised"),
                ("Unsupervised", "nClustering"),
