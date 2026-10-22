@@ -15,6 +15,7 @@ Writes  figures/fig-yearly.tex
         figures/fig-spatiotemporal.tex
         figures/fig-resolution.tex
         figures/fig-infrastructure.tex
+        figures/fig-collaboration.tex
         figures/fig-choropleth.tex
         figures/generated/numbers.tex     (LaTeX macros for use in the prose)
         figures/generated/NUMBERS.md      (every derived number + paper comparison)
@@ -25,6 +26,8 @@ spreadsheet edit and re-upload the generated files.
 
 Drawn by hand: fig-prisma.tex, whose counts are macros from numbers.tex (the
 PRISMA sheet and Selected_articles' Source column).
+fig-collaboration.tex reads the institutions_long sheet, which
+fetch_affiliations.py fills from OpenAlex; run that first when the corpus changes.
 NOT generated (no source column exists for these):
   fig-imagery.tex  - panels (b) imagery access and (c) sensor/scale strategy
 """
@@ -1071,6 +1074,196 @@ notes.append(("Platforms", "; ".join(f"{k} {n}" for k, n in reversed(_plc)) +
 notes.append(("Open science", f"repository {macros['nRepository']}; data link {macros['nDataLink']}; "
               f"interactive {macros['nInteractive']}", "PNG caption: 25 repositories"))
 
+# ---------------------------------------------------------------- collaboration
+# Author institutions from the institutions_long sheet, which
+# fetch_affiliations.py writes from OpenAlex (rows whose source starts with
+# "manual" were entered by hand). Its study_id is the workbook's study_id
+# column, not the row order this script numbers studies by. Partner categories
+# come from institution_types / institution_type_overrides in lookups.json.
+_wbid = {int(r["study_id"]): i for i, r in enumerate(sheet("Studies"), 1)}
+_inst = collections.defaultdict(list)
+for _r in sheet("institutions_long"):
+    if not blank(_r["study_id"]):
+        _inst[_wbid[int(_r["study_id"])]].append(_r)
+_noinst = [r["Title"] for r in STUDIES if r["study_id"] not in _inst]
+if _noinst:
+    sys.exit("no institutions_long rows for: %s (run fetch_affiliations.py or add manual rows)" % _noinst)
+AFRICA2 = set(LK["iso2_africa"])
+
+
+def inst_category(r):
+    """A named override first; then academic for any sub-unit of a university
+    (academic_parent set by fetch_affiliations.py); then the OpenAlex type."""
+    _nm = str(r["institution"]).strip()
+    if _nm in LK["institution_type_overrides"]:
+        return LK["institution_type_overrides"][_nm]
+    if not blank(r.get("academic_parent")):
+        return "Academic"
+    c = LK["institution_types"].get(str(r["type"]).strip())
+    if not c:
+        sys.exit("institution %r has OpenAlex type %r: add it to institution_types or "
+                 "institution_type_overrides in lookups.json" % (r["institution"], r["type"]))
+    return c
+
+
+_collab = {}
+for _sid, _rs in _inst.items():
+    _cs = sorted({str(r["country"]).strip() for r in _rs if not blank(r["country"])})
+    _cats = [inst_category(r) for r in _rs]
+    _afr, _non = any(c in AFRICA2 for c in _cs), any(c not in AFRICA2 for c in _cs)
+    _collab[_sid] = {
+        "n": len(_rs), "countries": _cs, "cats": _cats, "afr": _afr,
+        "lead": ("African-only" if _afr and not _non else "North-South" if _afr and _non
+                 else "Non-African-only"),
+        "breadth": ("Multi-country" if len(_cs) >= 2 else
+                    "Multi-institution, single-country" if len(_rs) >= 2 else "Single-institution"),
+        "cross": "Academic" in _cats and any(c != "Academic" for c in _cats)}
+# The six affiliation columns of Studies are derived from the same rows by
+# fetch_affiliations.py; stop if they have drifted.
+_stale = []
+for _r in STUDIES:
+    _c = _collab[_r["study_id"]]
+    for _k, _v in (("n_institutions", _c["n"]), ("inst_countries", "; ".join(_c["countries"])),
+                   ("collab_breadth", _c["breadth"]), ("has_african_inst", "Yes" if _c["afr"] else "No"),
+                   ("african_leadership", _c["lead"]), ("cross_sector", "Yes" if _c["cross"] else "No")):
+        if str(_r.get(_k)) != str(_v):
+            _stale.append((_r["study_id"], _k, _r.get(_k), _v))
+if _stale:
+    sys.exit("Studies affiliation columns disagree with institutions_long; re-run "
+             "fetch_affiliations.py: %s" % _stale[:5])
+
+_lead = collections.Counter(c["lead"] for c in _collab.values())
+_breadth = collections.Counter(c["breadth"] for c in _collab.values())
+_ctry = collections.Counter(c for v in _collab.values() for c in v["countries"])
+_cross = [c for c in _collab.values() if c["cross"]]
+# one count per distinct non-academic partner institution per study
+_partner = collections.Counter(cat for c in _cross for cat in c["cats"] if cat != "Academic")
+macros["nInstitutionRows"] = sum(len(v) for v in _inst.values())
+macros["nInstitutionCountries"] = len(_ctry)
+macros["nCollabAfricanOnly"] = _lead["African-only"]
+macros["nCollabNorthSouth"] = _lead["North-South"]
+macros["nCollabNonAfricanOnly"] = _lead["Non-African-only"]
+macros["nCollabAnyAfrican"] = _lead["African-only"] + _lead["North-South"]
+macros["nCollabSingleInstitution"] = _breadth["Single-institution"]
+macros["nCollabMultiInstitutionSingleCountry"] = _breadth["Multi-institution, single-country"]
+macros["nCollabMultiCountry"] = _breadth["Multi-country"]
+macros["nCollabCrossSector"] = len(_cross)
+macros["nPartnerInstances"] = sum(_partner.values())
+for _cat, _n in _partner.items():
+    macros["nPartner" + _cat] = _n
+for _k in ("CollabAfricanOnly", "CollabNorthSouth", "CollabNonAfricanOnly", "CollabAnyAfrican",
+           "CollabSingleInstitution", "CollabMultiInstitutionSingleCountry", "CollabMultiCountry",
+           "CollabCrossSector"):
+    macros["pct" + _k] = "%.1f" % (100 * macros["n" + _k] / N)
+TOPN_CTRY = 13
+_top = _ctry.most_common(TOPN_CTRY)[::-1]          # low -> high for the bar chart
+for _c, _n in _top:
+    if _c not in LK["iso2_names"]:
+        sys.exit("add ISO2 code %r to iso2_names in lookups.json" % _c)
+    macros["nInstCountry" + _c] = _n
+_ypos = {c: i + 1 for i, (c, _) in enumerate(_top)}
+_xmax = (max(n for _, n in _top) // 10 + 1) * 10 + 8
+
+PIE_COLOUR = {"African-only": "jsGreen", "North-South": "jsBlue", "Non-African-only": "jsGrey",
+              "Research facility": "jsTeal", "Non-profit / NGO": "jsAmber",
+              "Government / intergovernmental": "jsPlum", "Company": "jsRust", "Healthcare": "jsSeqIII"}
+PIE_LABEL = {"North-South": "North--South", "Government / intergovernmental": "Govt. / intergovernmental"}
+
+
+def pie(label, entries):
+    """entries: [(name, count)], drawn clockwise from 12 o'clock with a legend to the right."""
+    tot = sum(n for _, n in entries)
+    step, y0 = 0.52, (len(entries) - 1) / 2.0 * 0.52
+    wedges, inpct, legend = [], [], []
+    ang = 90.0
+    for i, (name, n) in enumerate(entries):
+        col = PIE_COLOUR[name]
+        a0, a1 = ang, ang - n / tot * 360.0
+        wedges.append(r"  \filldraw[slice, fill=%s] (0,0) -- (%.2f:\R) arc (%.2f:%.2f:\R) -- cycle;"
+                      % (col, a0, a0, a1))
+        pct = 100 * n / tot
+        text = esc(PIE_LABEL.get(name, name))
+        if a0 - a1 >= 28:
+            inpct.append(r"  \node[inpct, text=%s] at (%.2f:0.60*\R) {%.1f\%%};"
+                         % ("jsAxis" if col in ("jsGrey", "jsAmber") else "white", (a0 + a1) / 2, pct))
+            legtxt = r"%s ($n=%d$)" % (text, n)
+        else:
+            legtxt = r"%s (%.1f\%%, $n=%d$)" % (text, pct, n)
+        yy = y0 - i * step
+        legend.append(r"  \filldraw[fill=%s, draw=white, line width=0.4pt] (2.05,%.2f) rectangle ++(0.28,0.28);"
+                      % (col, yy - 0.14))
+        legend.append(r"  \node[legtxt, anchor=west] at (2.45,%.2f) {%s};" % (yy, legtxt))
+        ang = a1
+    return "\n".join([r"\begin{tikzpicture}", r"  \def\R{1.25}",
+                      r"  \tikzset{slice/.style={draw=white, line width=1.1pt}, inpct/.style={font=\scriptsize},",
+                      r"           legtxt/.style={font=\scriptsize, text=jsAxis}}",
+                      r"  \node[font=\small\bfseries, text=jsAxis, anchor=south west] at (-1.5,1.45) {%s};" % label]
+                     + wedges + inpct + legend + [r"\end{tikzpicture}"])
+
+
+_pie_b = pie("(b)", [(k, _lead[k]) for k in ("African-only", "North-South", "Non-African-only")])
+_pie_c = pie("(c)", _partner.most_common())
+(HERE / "fig-collaboration.tex").write_text(BANNER + r"""%% Author institutions from source/Reviewed_articles_only.xlsx, sheet
+%% institutions_long (fetch_affiliations.py, OpenAlex), categorised by
+%% institution_types / institution_type_overrides in source/lookups.json.
+\begin{figure*}[pos=!t]
+\centering
+\begin{minipage}[c]{0.50\textwidth}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  jsxbar, scale only axis, width=4.8cm, height=%.1fcm,
+  title={(a)}, area legend,
+  xlabel={Studies with an author institution in the country},
+  xmin=0, xmax=%d, xtick={%s},
+  ymin=0.4, ymax=%d.6, ytick={%s}, yticklabels={%s},
+  bar width=7pt, enlarge y limits=0,
+  nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}},
+  legend style={at={(0.98,0.02)}, anchor=south east, fill=white, fill opacity=0.92, text opacity=1, font=\footnotesize},
+  legend cell align=left,
+]
+\addplot[draw=none, fill=jsGreen, bar shift=0pt] coordinates {%s};
+\addplot[draw=none, fill=jsGrey,  bar shift=0pt] coordinates {%s};
+\legend{African, Non-African}
+\end{axis}
+\end{tikzpicture}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.48\textwidth}
+\centering
+%s
+\vspace{1.0em}
+%s
+\end{minipage}
+\caption{Institutional collaboration across the %d reviewed studies, from author
+affiliations. (a)~Contributing institution countries: the number of studies with at
+least one author institution in the country, top %d of %d shown. (b)~Share of studies
+by African institutional leadership: African-only, North--South, and non-African-only
+institutions. (c)~Non-academic partners of the %d studies that combine academic and
+non-academic institutions, by institution type; one count per distinct partner
+institution per study (%d in all).}
+\label{fig:collaboration}
+\end{figure*}
+""" % (round(0.46 * len(_top) + 0.5, 1), _xmax, ",".join(str(t) for t in range(0, _xmax - 6, 10)),
+       len(_top), ",".join(str(i + 1) for i in range(len(_top))),
+       ",".join("{%s}" % esc(LK["iso2_names"][c]) for c, _ in _top),
+       " ".join("(%d,%d)" % (n, _ypos[c]) for c, n in _top if c in AFRICA2),
+       " ".join("(%d,%d)" % (n, _ypos[c]) for c, n in _top if c not in AFRICA2),
+       _pie_b, _pie_c, N, len(_top), len(_ctry), len(_cross), sum(_partner.values())))
+notes.append(("Author institutions", f"{macros['nInstitutionRows']} institution rows over {N} studies, "
+              f"{len(_ctry)} countries; top: " + "; ".join(f"{c} {n}" for c, n in reversed(_top)),
+              "OpenAlex via fetch_affiliations.py; coded by hand: studies " +
+              ", ".join(str(k) for k in sorted({int(r["study_id"]) for rs in _inst.values() for r in rs
+                                                if str(r.get("source", "")).startswith("manual")}))))
+notes.append(("Collaboration", f"African-only {_lead['African-only']}; North-South {_lead['North-South']}; "
+              f"Non-African-only {_lead['Non-African-only']}; any African institution "
+              f"{macros['nCollabAnyAfrican']} ({macros['pctCollabAnyAfrican']}%); single institution "
+              f"{_breadth['Single-institution']}; multi-institution single-country "
+              f"{_breadth['Multi-institution, single-country']}; multi-country {_breadth['Multi-country']}",
+              "fig-collaboration (b)"))
+notes.append(("Cross-sector partners", f"{len(_cross)} cross-sector studies; partner institutions: " +
+              "; ".join(f"{k} {n}" for k, n in _partner.most_common()),
+              "earlier hand count: facility 86, nonprofit 33, government 32, company 10"))
+
 # ---------------------------------------------------------------- counts named in the prose
 # Shares of each domain and year, the top three countries by ISO3 code, and the
 # individual sources the Results and the DEM table name.
@@ -1214,7 +1407,7 @@ md += [f"| {a} | {b} | {c} |" for a, b, c in notes]
 
 print(f"source : {SRC.name}  ({N} studies)")
 print("wrote  : fig-yearly, fig-domain, fig-methods, fig-models-year,")
-print("         fig-journals, fig-resolution, fig-spatiotemporal, fig-infrastructure")
+print("         fig-journals, fig-resolution, fig-spatiotemporal, fig-infrastructure, fig-collaboration")
 print("         generated/numbers.tex, generated/NUMBERS.md")
 
 # ================================================================ 9. Choropleth map
