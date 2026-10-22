@@ -933,6 +933,16 @@ macros["nAirborneOnly"] = len(airb - sat)
 _cat = by([r for r in EO if r["Platform"] == "Satellite"], "Category")
 macros["nSARStudies"] = len(_cat.get("SAR", set()))
 macros["nPassiveMicrowave"] = len(_cat.get("Passive microwave", set()))
+# imagery access of the satellite studies (Studies' "Imagery access" column);
+# the coded studies must be exactly the satellite studies
+_acc = {r["study_id"]: str(r.get("Imagery access") or "").strip() for r in STUDIES}
+_accsat = {s for s, v in _acc.items() if v in ("Public", "Mixed", "Commercial")}
+if _accsat != sat:
+    sys.exit("Imagery access: coded studies differ from the satellite studies: %s"
+             % sorted(_accsat ^ sat))
+for _v, _k in (("Public", "nImageryPublic"), ("Mixed", "nImageryMixed"),
+               ("Commercial", "nImageryCommercial")):
+    macros[_k] = sum(1 for s in sat if _acc[s] == _v)
 
 gee = by(PL, "Platform")
 n_pl = len({r["study_id"] for r in PL})
@@ -1381,6 +1391,10 @@ for _k, _num, _den in (("pctRandomForest", "nRandomForest", "nClassical"),
                        ("pctSatelliteOfEO", "nSatellite", "nEOStudies"),
                        ("pctSAR", "nSARStudies", "nSatellite"),
                        ("pctPassiveMicrowave", "nPassiveMicrowave", "nSatellite"),
+                       ("pctImageryPublic", "nImageryPublic", "nSatellite"),
+                       ("pctImageryMixed", "nImageryMixed", "nSatellite"),
+                       ("pctImageryCommercial", "nImageryCommercial", "nSatellite"),
+                       ("pctClustering", "nClustering", "nStudies"),
                        ("pctPlatformReporting", "nPlatformReporting", "nStudies"),
                        ("pctGEE", "nGEE", "nPlatformReporting"),
                        ("pctGEEofAll", "nGEE", "nStudies"),
