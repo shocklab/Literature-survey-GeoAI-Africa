@@ -1147,13 +1147,17 @@ macros["nCollabAnyAfrican"] = _lead["African-only"] + _lead["North-South"]
 macros["nCollabSingleInstitution"] = _breadth["Single-institution"]
 macros["nCollabMultiInstitutionSingleCountry"] = _breadth["Multi-institution, single-country"]
 macros["nCollabMultiCountry"] = _breadth["Multi-country"]
+macros["nCollabMultiInstitution"] = N - _breadth["Single-institution"]
 macros["nCollabCrossSector"] = len(_cross)
+# the rest of the corpus: academic institutions only, or no academic institution at all
+macros["nCollabAcademicOnly"] = sum(1 for c in _collab.values() if set(c["cats"]) == {"Academic"})
+macros["nCollabNoAcademic"] = sum(1 for c in _collab.values() if "Academic" not in c["cats"])
 macros["nPartnerInstances"] = sum(_partner.values())
 for _cat, _n in _partner.items():
     macros["nPartner" + _cat] = _n
 for _k in ("CollabAfricanOnly", "CollabNorthSouth", "CollabNonAfricanOnly", "CollabAnyAfrican",
            "CollabSingleInstitution", "CollabMultiInstitutionSingleCountry", "CollabMultiCountry",
-           "CollabCrossSector"):
+           "CollabMultiInstitution", "CollabCrossSector", "CollabAcademicOnly", "CollabNoAcademic"):
     macros["pct" + _k] = "%.1f" % (100 * macros["n" + _k] / N)
 TOPN_CTRY = 13
 _top = _ctry.most_common(TOPN_CTRY)[::-1]          # low -> high for the bar chart
@@ -1260,7 +1264,9 @@ notes.append(("Collaboration", f"African-only {_lead['African-only']}; North-Sou
               f"{_breadth['Single-institution']}; multi-institution single-country "
               f"{_breadth['Multi-institution, single-country']}; multi-country {_breadth['Multi-country']}",
               "fig-collaboration (b)"))
-notes.append(("Cross-sector partners", f"{len(_cross)} cross-sector studies; partner institutions: " +
+notes.append(("Cross-sector partners", f"{len(_cross)} cross-sector studies ({macros['pctCollabCrossSector']}%); "
+              f"academic only {macros['nCollabAcademicOnly']} ({macros['pctCollabAcademicOnly']}%); "
+              f"no academic institution {macros['nCollabNoAcademic']}; partner institutions: " +
               "; ".join(f"{k} {n}" for k, n in _partner.most_common()),
               "earlier hand count: facility 86, nonprofit 33, government 32, company 10"))
 
